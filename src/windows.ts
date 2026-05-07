@@ -51,7 +51,9 @@ function createMainWindow() {
     resizable: false,
     frame: false,
     transparent: true,
-    vibrancy: 'fullscreen-ui',
+    hasShadow: false,
+    roundedCorners: false,
+    // vibrancy: 'fullscreen-ui',
     show: false,
     // alwaysOnTop: true,
     x:
@@ -109,6 +111,8 @@ function createMainWindow() {
     win.show()
   }
 
+  win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+
   instrumentizeWindow(win)
 
   mainWindow = win
@@ -132,7 +136,9 @@ function createSettingsWindow() {
     resizable: false,
     frame: false,
     transparent: true,
-    vibrancy: 'fullscreen-ui',
+    hasShadow: false,
+    roundedCorners: false,
+    // vibrancy: 'fullscreen-ui',
     webPreferences: {
       preload: path.join(__dirname, '../renderer/preload.js'),
       webSecurity: false,
@@ -179,7 +185,9 @@ function createOnboardingWindow() {
     resizable: false,
     frame: false,
     transparent: true,
-    vibrancy: 'fullscreen-ui',
+    hasShadow: false,
+    roundedCorners: false,
+    // vibrancy: 'fullscreen-ui',
     webPreferences: {
       preload: path.join(__dirname, '../renderer/preload.js'),
       webSecurity: false,

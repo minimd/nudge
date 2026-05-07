@@ -30,7 +30,6 @@
 - [ ] Feat: post to calendar.
 - [ ] Investigate possibility of non-native Notifications (problem: fullscreen?).
 - [ ] iPhone app.
-- [ ] Try to make it smaller.
 - [ ] Write privacy page.
 
 ## v0.1.x
