@@ -62,6 +62,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return await typedIpcRenderer.invoke('getImageFromFs', src)
   },
 
+  checkLocalModel: async () => {
+    return await typedIpcRenderer.invoke('checkLocalModel')
+  },
+
   finishOnboarding: async () => {
     return await typedIpcRenderer.invoke('finishOnboarding')
   },

@@ -139,9 +139,10 @@ export function hasFinishedOnboardingSteps() {
 
   const hasOpenAiKey = !!state.modelSelection?.key
   const isUsingCloud = state.useNudgeCloud
+  const isUsingLocal = state.modelSelection?.name === 'local'
   const hasScreenPermissions = checkScreenPermissions()
 
-  return (hasOpenAiKey || isUsingCloud) && hasScreenPermissions
+  return (hasOpenAiKey || isUsingCloud || isUsingLocal) && hasScreenPermissions
 }
 
 export function isOnboardingFinished() {

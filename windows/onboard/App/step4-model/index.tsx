@@ -1,8 +1,9 @@
-import { Cloud, Key } from 'lucide-react'
+import { Cloud, Cpu, Key } from 'lucide-react'
 import { RefObject, useEffect, useRef, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { openExternal, useBackendState } from '../../../shared/ipc'
 import { SparkleIcon } from '../../../shared/ui/icons'
+import { LocalModelStatus } from '../../../shared/ui/LocalModelStatus'
 import { withBoundary } from '../../../shared/ui/withBoundary'
 import { SubmitButton } from '../SubmitButton'
 import { OnboardingScreenHeader } from '../ui'
@@ -14,13 +15,13 @@ interface Props {
   goBack?: () => void
 }
 
-type Value = 'nudge-cloud' | 'openai'
+type Value = 'local' | 'nudge-cloud' | 'openai'
 
 export const AISelectionScreen = withBoundary(({ next, goBack }: Props) => {
-  const { setPartialState } = useBackendState()
+  const { state, setPartialState } = useBackendState()
 
   // state
-  const [selection, setSelection] = useState<Value | null>(null)
+  const [selection, setSelection] = useState<Value | null>('local')
   const [openAIKey, setOpenAIKey] = useState<string | null>(null)
 
   // ui
@@ -32,7 +33,12 @@ export const AISelectionScreen = withBoundary(({ next, goBack }: Props) => {
       return
     }
 
-    if (selection === 'nudge-cloud') {
+    if (selection === 'local') {
+      await setPartialState({
+        useNudgeCloud: false,
+        modelSelection: { name: 'local', key: null, validatedAt: null },
+      })
+    } else if (selection === 'nudge-cloud') {
       await setPartialState({
         useNudgeCloud: true,
       })
@@ -40,7 +46,7 @@ export const AISelectionScreen = withBoundary(({ next, goBack }: Props) => {
       await setPartialState({
         useNudgeCloud: false,
         modelSelection: {
-          name: 'openai-4o-mini',
+          name: 'openai',
           key: openAIKey,
           validatedAt: null,
         },
@@ -68,6 +74,20 @@ export const AISelectionScreen = withBoundary(({ next, goBack }: Props) => {
         />
         <div className="flex flex-col gap-2 h-full ">
           <ModelOption
+            title="Run it on this Mac (recommended)"
+            subtitle="A local vision model through Ollama. Free, offline, and your screen never leaves the machine."
+            icon={<Cpu className="w-5 h-5 shrink-0 text-inherit" />}
+            onClick={() => {
+              setSelection('local')
+            }}
+            active={selection === 'local'}
+            activeChildren={
+              <div className="flex w-full flex-col gap-3 border-one border-t pt-3">
+                <LocalModelStatus model={state?.localModel || ''} />
+              </div>
+            }
+          />
+          <ModelOption
             title="Use my own OpenAI key"
             subtitle="Enter an OpenAI API key if you have one and want to control your own data."
             icon={<Key className="w-5 h-5 shrink-0 text-inherit" />}
@@ -78,7 +98,7 @@ export const AISelectionScreen = withBoundary(({ next, goBack }: Props) => {
             activeChildren={
               <div className="flex w-full flex-col gap-3 border-one border-t pt-3">
                 <OpenAiKeyInput
-                  model={'openai-4o-mini'}
+                  model={'openai'}
                   currentKey={openAIKey || null}
                   value={openAIKey || ''}
                   onChange={(e) => {

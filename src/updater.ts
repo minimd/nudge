@@ -21,8 +21,12 @@ import { getImagePath, getIsOutsideApplicationsFolder } from './lib/utils'
 const isOutsideApplicationsFolder = getIsOutsideApplicationsFolder()
 
 // Do a check 2 minutes in.
+// Local-first fork: the upstream feed would replace this build with the
+// cloud version, so auto-update is disabled.
+const UPDATES_ENABLED = false
+
 setTimeout(async () => {
-  if (!app.isPackaged) {
+  if (!UPDATES_ENABLED || !app.isPackaged) {
     // Don't check for updates in dev mode.
     return
   }
@@ -36,11 +40,13 @@ setTimeout(async () => {
   }
 }, CHECK_UPDATE_AFTER_MS)
 
-autoUpdater.setFeedURL({
+if (UPDATES_ENABLED) {
+  autoUpdater.setFeedURL({
   url: `https://update.electronjs.org/felipap/nudge/darwin-${
     process.arch
   }/${app.getVersion()}`,
 })
+}
 
 async function showOutsideApplicationsFolderDialog() {
   await dialog.showMessageBox({
@@ -125,6 +131,9 @@ let isCheckingForUpdatesOrDownloading = false
 async function asyncCheckForUpdatesAndDownload(
   onAvailableAndDownloading?: () => void
 ): Promise<'failed' | 'not-available' | 'downloaded' | 'outside-macos-apps'> {
+  if (!UPDATES_ENABLED) {
+    return 'not-available'
+  }
   // Would be nice to only return this when the update is available, but AFAIK
   // if the update is available ShipIt _will_ try to install it and then fail,
   // and then complain. (Abhi reported this.) So we have to NOT check for the

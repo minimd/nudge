@@ -10,10 +10,28 @@ import {
 import { Input } from '../../../shared/ui/native/Input'
 import { Select } from '../../../shared/ui/native/Select'
 import { withBoundary } from '../../../shared/ui/withBoundary'
+import { LocalModelStatus } from '../../../shared/ui/LocalModelStatus'
 import { Fieldset, Label } from '../ui'
 
 export const ByomFieldGroup = withBoundary(() => {
   const { model, setModel } = useModelChoiceWithBackend()
+
+  if (model?.name === 'local') {
+    return (
+      <>
+        <Fieldset>
+          <Label className="track-10">Model</Label>
+          <ModelSelect
+            value={model.name}
+            onChange={(value) => {
+              setModel({ name: value, key: null, validatedAt: null })
+            }}
+          />
+        </Fieldset>
+        <LocalFields />
+      </>
+    )
+  }
 
   return (
     <>
@@ -186,4 +204,49 @@ function useModelChoiceWithBackend() {
   }
 
   return { model, setModel }
+}
+
+function LocalFields() {
+  const { state, setPartialState } = useBackendState()
+  const [endpoint, setEndpoint] = useState('')
+  const [localModel, setLocalModel] = useState('')
+
+  useEffect(() => {
+    if (state) {
+      setEndpoint(state.localEndpoint)
+      setLocalModel(state.localModel)
+    }
+  }, [!!state])
+
+  return (
+    <>
+      <Fieldset>
+        <Label>Ollama model</Label>
+        <Input
+          className="w-[300px]"
+          value={localModel}
+          placeholder="qwen3-vl:8b-instruct"
+          onChange={(e) => {
+            setLocalModel(e.target.value)
+            setPartialState({ localModel: e.target.value.trim() })
+          }}
+        />
+      </Fieldset>
+      <Fieldset>
+        <Label>Endpoint</Label>
+        <Input
+          className="w-[300px]"
+          value={endpoint}
+          placeholder="http://127.0.0.1:11434"
+          onChange={(e) => {
+            setEndpoint(e.target.value)
+            setPartialState({ localEndpoint: e.target.value.trim() })
+          }}
+        />
+      </Fieldset>
+      <div className="pl-1">
+        <LocalModelStatus model={localModel} refreshKey={endpoint + localModel} />
+      </div>
+    </>
+  )
 }

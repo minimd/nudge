@@ -3,6 +3,7 @@ import {
   ModelError,
 } from '../../windows/shared/shared-types'
 import { DOUBLE_NUDGE_THRESHOLD_MINS } from '../lib/config'
+import { DEFAULT_LOCAL_MODEL, DEFAULT_OLLAMA_ENDPOINT } from '../ai/local/ollama'
 
 export interface Capture {
   summary: string
@@ -80,6 +81,9 @@ export type State = {
   // history of captures
   // savedCaptures: Capture[]
   customInstructions: string | null
+  // Local (Ollama) backend. Used when modelSelection.name === 'local'.
+  localEndpoint: string
+  localModel: string
   events?: {
     firstOpenedAt?: Date
     finishedOnboardingAt?: Date
@@ -103,7 +107,10 @@ export const DEFAULT_STATE: State = {
   lastClosedAt: null,
   // settings
   useNudgeCloud: false, // Important to start with false.
-  modelSelection: null,
+  // Local-first fork: default to the on-device model, no key needed.
+  modelSelection: { name: 'local', key: null, validatedAt: null },
+  localEndpoint: DEFAULT_OLLAMA_ENDPOINT,
+  localModel: DEFAULT_LOCAL_MODEL,
   captureEverySeconds: 60,
   isWindowPinned: false,
   customInstructions: null,

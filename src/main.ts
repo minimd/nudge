@@ -11,7 +11,8 @@ import { onAppClose, onAppStart } from './logic'
 import { createTray } from './tray'
 import { createWindows, prefWindow } from './windows'
 
-if (app.isPackaged) {
+// Local-first fork: no crash reporting to the upstream author's Sentry.
+if (process.env.NUDGE_ENABLE_SENTRY === 'true') {
   SentryInit({
     dsn: 'https://df66516e528e1e116926f9631fca55f3@o175888.ingest.us.sentry.io/4509567206555648',
     release: app.getVersion(),

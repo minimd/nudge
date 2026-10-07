@@ -15,6 +15,20 @@ The AI that nudges you into flow.
 </p>
 </p>
 
+> **Local-first fork.** This fork runs the vision model **on your Mac** through
+> [Ollama](https://ollama.com) (default: `qwen3-vl:8b-instruct`). No API key, no
+> cloud, no telemetry, no auto-update to the cloud build. Screenshots never leave
+> the machine.
+>
+> ```bash
+> git clone https://github.com/minimd/nudge && cd nudge
+> ./scripts/setup-local-mac.sh       # installs Ollama, pulls the model, builds + installs Nudge.app
+> ```
+>
+> Lighter model: `MODEL=qwen3-vl:4b-instruct ./scripts/setup-local-mac.sh`.
+> Eval the local model on the bundled screenshots: `npx tsx src/ai/local/eval.ts`.
+> Code: `src/ai/local/`. OpenAI/Gemini/Nudge Cloud are still selectable in Settings.
+
 ## About
 
 Nudge is an app for macOS that watches your screen and helps you stay in flow. Describe an activity and a duration ("I want to vibe code for an hour") and Nudge will notify you when it looks like you're doing something else.

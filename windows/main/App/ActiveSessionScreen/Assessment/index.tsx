@@ -22,6 +22,8 @@ type FeedbackType =
   | 'internet-error'
   | 'distracted'
   | 'no-api-key'
+  | 'ollama-down'
+  | 'model-missing'
 
 function useCaptureAssessment(): Feedback | null {
   useRenderEvery(5_000)
@@ -86,6 +88,12 @@ export const Assessment = withBoundary(() => {
     className = 'text-red-800 dark:text-red-300'
   } else if (assessment.type === 'no-api-key') {
     text = 'No model key'
+    className = 'text-red-800 dark:text-red-300'
+  } else if (assessment.type === 'ollama-down') {
+    text = 'Ollama is not running'
+    className = 'text-red-800 dark:text-red-300'
+  } else if (assessment.type === 'model-missing') {
+    text = 'Local model not downloaded'
     className = 'text-red-800 dark:text-red-300'
   } else {
     assessment.type satisfies never
@@ -222,6 +230,12 @@ function extractAssessmentFromState(state: State | null): {
     }
     if (relevantCapture.modelError === 'no-internet') {
       return { type: 'internet-error', message: null }
+    }
+    if (relevantCapture.modelError === 'ollama-down') {
+      return { type: 'ollama-down', message: 'Start Ollama: open the Ollama app or run `ollama serve`' }
+    }
+    if (relevantCapture.modelError === 'model-missing') {
+      return { type: 'model-missing', message: 'Run `ollama pull <model>` (see Settings → Model)' }
     }
     return { type: 'unknown-error', message: null }
   }

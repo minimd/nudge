@@ -23,7 +23,7 @@ export function ModelTab() {
   const { state } = useBackendState()
 
   let modelSelector
-  if (state?.useNudgeCloud) {
+  if (state?.useNudgeCloud && state?.modelSelection?.name !== 'local') {
     modelSelector = (
       <div className="track-10 text-[14px] px-1 leading-[1.3]">
         0 of 20 hours used
@@ -129,8 +129,14 @@ export function ToggleNudgeCloud() {
   const { state, setPartialState } = useBackendState()
 
   const onChange = () => {
+    const turningOn = !state?.useNudgeCloud
     setPartialState({
-      useNudgeCloud: !state?.useNudgeCloud,
+      useNudgeCloud: turningOn,
+      // Local wins in getAiBackendClient, so switching to cloud must leave it,
+      // and switching cloud off falls back to the local model.
+      modelSelection: turningOn
+        ? null
+        : { name: 'local', key: null, validatedAt: null },
     })
   }
 

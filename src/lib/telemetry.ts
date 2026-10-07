@@ -84,6 +84,10 @@ function isFelipe(): boolean {
 
 // Don't capture local events.
 function getIgnoreReason() {
+  // Local-first fork: telemetry is always off.
+  if (process.env.NUDGE_ENABLE_SENTRY !== 'true') {
+    return 'local-fork'
+  }
   if (!app.isPackaged) {
     return 'not-packaged'
   }

@@ -55,6 +55,10 @@ export function SubmitButton({
       text = 'Problem: no internet connection'
     } else if (feedbackResult.error === 'bad-api-key') {
       text = 'Problem with your OpenAI key'
+    } else if (feedbackResult.error === 'ollama-down') {
+      text = 'Ollama is not running'
+    } else if (feedbackResult.error === 'model-missing') {
+      text = 'Local model not downloaded'
     } else if (feedbackResult.error === 'ai-rate-limit') {
       text = 'OpenAI rate limit exceeded'
     } else {

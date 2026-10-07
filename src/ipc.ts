@@ -17,6 +17,7 @@ import {
   IpcMainMethods,
 } from '../windows/shared/shared-types'
 import { getAiBackendClient, getGoalFeedback, validateModelKey } from './ai'
+import { checkLocalModel } from './ai/local/ollama'
 import * as screenCapture from './lib/capture-service'
 import { GITHUB_DISCUSSIONS_URL } from './lib/config'
 import { debug, log, logError, warn } from './lib/logger'
@@ -255,6 +256,11 @@ export function setupIPC() {
       return await validateModelKey(model, key)
     }
   )
+
+  ipcMainTyped.handle('checkLocalModel', async () => {
+    const { localEndpoint, localModel } = getState()
+    return await checkLocalModel(localEndpoint, localModel)
+  })
 
   ipcMainTyped.handle('finishOnboarding', async (_event) => {
     await tryRegisterOnboardingDone()

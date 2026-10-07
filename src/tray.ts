@@ -141,16 +141,7 @@ export function createTray() {
         },
       })
     } else {
-      template.push({
-        enabled: updaterState !== 'downloading',
-        label:
-          updaterState === 'downloading'
-            ? 'Downloading update...'
-            : 'Check for updates...',
-        click: async () => {
-          await onClickCheckForUpdates()
-        },
-      })
+      // Local-first fork: no 'Check for updates' (upstream feed is the cloud build).
       template.push({
         label: 'Quit',
         sublabel: '⌘Q',

@@ -2,6 +2,8 @@ import OpenAI from 'openai'
 import { debug } from '../lib/logger'
 import { getGoalFeedbackFromNudgeAPI } from './cloud/goal-feedback'
 import { getGoalFeedbackFromGemini } from './gemini/goal-feedback'
+import { mapLocalError } from './assess-capture'
+import { getGoalFeedbackLocally } from './local/goal-feedback'
 import { BackendClient } from './models'
 import { getGoalFeedbackFromOpenAI } from './openai/goal-feedback'
 import { Result } from './openai/utils'
@@ -22,6 +24,18 @@ export async function getGoalFeedback(
 
   if (client.provider === 'nudge') {
     return await getGoalFeedbackFromNudgeAPI(goal)
+  }
+
+  if (client.provider === 'local') {
+    const local = await getGoalFeedbackLocally({
+      endpoint: client.endpoint,
+      model: client.model,
+      goal,
+    })
+    if ('error' in local) {
+      return { error: mapLocalError(local.error), message: local.message }
+    }
+    return local
   }
 
   if (client.provider === 'gemini') {

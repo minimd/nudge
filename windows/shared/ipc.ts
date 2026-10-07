@@ -36,6 +36,10 @@ export async function getWindowHeight() {
   return await window.electronAPI.getWindowHeight()
 }
 
+export async function checkLocalModel() {
+  return await window.electronAPI.checkLocalModel()
+}
+
 export async function finishOnboarding() {
   return await window.electronAPI.finishOnboarding()
 }

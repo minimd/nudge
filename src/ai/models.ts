@@ -3,6 +3,7 @@ import OpenAI from 'openai'
 import { AvailableProvider } from '../../windows/shared/shared-types'
 import { debug, logError, warn } from '../lib/logger'
 import { getState, ProviderSelection } from '../store'
+import { checkLocalModel } from './local/ollama'
 
 export async function validateModelKey(
   provider: AvailableProvider,
@@ -20,6 +21,10 @@ export async function validateModelKey(
   }
   if (provider === 'nudge') {
     return true
+  }
+  if (provider === 'local') {
+    const { localEndpoint, localModel } = getState()
+    return (await checkLocalModel(localEndpoint, localModel)) === 'ok'
   }
 
   throw new Error(`Unknown provider: ${provider}`)
@@ -60,10 +65,25 @@ export type ModelClient =
       key: string
     }
 
-export type BackendClient = ModelClient | { provider: 'nudge' }
+export type LocalClient = {
+  provider: 'local'
+  endpoint: string
+  model: string
+}
+
+export type BackendClient = ModelClient | LocalClient | { provider: 'nudge' }
 
 export function getAiBackendClient(): BackendClient | null {
-  const useNudgeCloud = getState().useNudgeCloud
+  const state = getState()
+  if (state.modelSelection?.name === 'local') {
+    return {
+      provider: 'local',
+      endpoint: state.localEndpoint,
+      model: state.localModel,
+    }
+  }
+
+  const useNudgeCloud = state.useNudgeCloud
 
   if (useNudgeCloud) {
     return { provider: 'nudge' }

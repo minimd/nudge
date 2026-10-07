@@ -16,6 +16,8 @@ type CallError =
   | 'rate-limit' // this only when Nudge Cloud
   | 'ai-rate-limit'
   | 'no-internet'
+  | 'ollama-down'
+  | 'model-missing'
 
 // Signature for the openai functions.
 export type Result<D> =

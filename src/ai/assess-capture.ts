@@ -3,6 +3,8 @@ import OpenAI from 'openai'
 import { debug } from '../lib/logger'
 import { assessFlowFromNudgeAPI } from './cloud/assess-capture'
 import { assessFlowWithGemini } from './gemini/assess-capture'
+import { assessFlowLocally } from './local/assess-capture'
+import { LocalError } from './local/ollama'
 import { BackendClient } from './models'
 import { assessFlowWithOpenAI } from './openai/assess-capture'
 import { Result } from './openai/utils'
@@ -34,6 +36,21 @@ export async function assessFlowFromScreenshot(
       customInstructions,
       previousCaptures
     )
+  }
+
+  if (client.provider === 'local') {
+    const local = await assessFlowLocally({
+      endpoint: client.endpoint,
+      model: client.model,
+      imageDataUrl: base64content,
+      goal,
+      customInstructions,
+    })
+    if ('error' in local) {
+      debug('[ai/local] error', local)
+      return { error: mapLocalError(local.error), message: local.message }
+    }
+    return { data: local.data }
   }
 
   let res
@@ -72,4 +89,13 @@ export async function assessFlowFromScreenshot(
       goalUnclear: res.data.goalUnclear,
     },
   }
+}
+
+export function mapLocalError(
+  e: LocalError
+): 'ollama-down' | 'model-missing' | 'unknown' {
+  if (e === 'ollama-down' || e === 'model-missing') {
+    return e
+  }
+  return 'unknown'
 }

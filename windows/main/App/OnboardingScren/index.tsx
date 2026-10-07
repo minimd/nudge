@@ -18,7 +18,9 @@ export function useOnboardingState() {
 
   const hasConfiguredBackend = !!(
     state &&
-    (state.useNudgeCloud || state.modelSelection?.key)
+    (state.useNudgeCloud ||
+      state.modelSelection?.key ||
+      state.modelSelection?.name === 'local')
   )
 
   return {

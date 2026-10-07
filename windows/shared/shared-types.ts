@@ -13,6 +13,10 @@ export type ModelError =
   | 'ai-rate-limit'
   | 'rate-limit' // this only when Nudge Cloud
   | 'no-internet'
+  | 'ollama-down'
+  | 'model-missing'
+
+export type LocalModelStatus = 'ok' | 'ollama-down' | 'model-missing'
 
 export type GoalFeedbackType =
   | 'lacking-duration'
@@ -24,10 +28,11 @@ export type GoalFeedbackType =
 //
 // Available models
 
-export type AvailableProvider = 'openai' | 'gemini' | 'nudge'
+export type AvailableProvider = 'local' | 'openai' | 'gemini' | 'nudge'
 
 export const AVAILABLE_PROVIDERS: { name: string; value: AvailableProvider }[] =
   [
+    { name: 'Local (Ollama)', value: 'local' },
     { name: 'OpenAI', value: 'openai' },
     { name: 'Gemini', value: 'gemini' },
   ]
@@ -65,6 +70,7 @@ type SharedIpcMethods = {
   startSession: (goal: string, durationMs: number) => Promise<void>
   captureNow: () => Promise<void>
   validateModelKey: (model: AvailableProvider, key: string) => Promise<boolean>
+  checkLocalModel: () => Promise<LocalModelStatus>
   setAutoLaunch: (enable: boolean) => Promise<void>
   getAutoLaunch: () => Promise<boolean>
   openSettings: (tab?: string) => Promise<void>
